@@ -1,0 +1,250 @@
+{
+  "api_base_url": {
+    "description": "API Base URL",
+    "type": "string",
+    "hint": "外部生图服务的基础地址，例如 https://api.example.com。",
+    "default": ""
+  },
+  "api_key": {
+    "description": "API Key",
+    "type": "string",
+    "hint": "外部生图服务的密钥。插件只会通过 Authorization: Bearer <API Key> 发送，不会写入日志。",
+    "default": ""
+  },
+  "text_to_image_path": {
+    "description": "文生图接口路径",
+    "type": "string",
+    "hint": "相对于 API Base URL 的文生图路径。",
+    "default": "/v1/images/generations"
+  },
+  "image_to_image_path": {
+    "description": "图生图接口路径",
+    "type": "string",
+    "hint": "相对于 API Base URL 的图生图路径。",
+    "default": "/v1/images/edits"
+  },
+  "model": {
+    "description": "模型名称",
+    "type": "string",
+    "default": "image-model"
+  },
+  "default_image_size": {
+    "description": "默认图片尺寸",
+    "type": "string",
+    "hint": "用户未在消息中指定尺寸时使用。用户可在 prompt 中写 1024x1024、尺寸 768x1024 或 --size 512x512。",
+    "default": "1024x1024"
+  },
+  "timeout_seconds": {
+    "description": "超时时间（秒）",
+    "type": "int",
+    "default": 60
+  },
+  "auto_recognize": {
+    "description": "是否启用自动识别",
+    "type": "bool",
+    "hint": "关闭后不会监听普通聊天中的生图意图，但 /imagegen 和 /img2img 命令仍可使用。",
+    "default": true
+  },
+  "trigger_keywords": {
+    "description": "文生图触发关键词列表",
+    "type": "list",
+    "hint": "额外触发文生图识别的关键词。内置文生图关键词会始终保留。",
+    "default": []
+  },
+  "image_to_image_trigger_keywords": {
+    "description": "图生图触发关键词列表",
+    "type": "list",
+    "hint": "额外触发图生图识别的关键词。内置图生图关键词会始终保留。",
+    "default": []
+  },
+  "enable_context_image_reference": {
+    "description": "是否启用上下文图片引用",
+    "type": "bool",
+    "hint": "开启后，用户先发图片、再说“把上面那张图改成...”时会使用当前会话最近图片。",
+    "default": true
+  },
+  "recent_image_ttl_seconds": {
+    "description": "最近图片缓存时间（秒）",
+    "type": "int",
+    "hint": "超过该时间后，上一张图片不会再被后续文本引用。",
+    "default": 600
+  },
+  "max_cached_images_per_session": {
+    "description": "每个会话缓存图片数量",
+    "type": "int",
+    "hint": "当前实现默认只使用最近一张图片。建议保持 1。",
+    "default": 1
+  },
+  "max_input_image_bytes": {
+    "description": "输入图片最大大小（字节）",
+    "type": "int",
+    "hint": "超过该大小的用户图片不会缓存或提交给图生图 API。",
+    "default": 10485760
+  },
+  "max_output_image_bytes": {
+    "description": "输出图片最大大小（字节）",
+    "type": "int",
+    "hint": "超过该大小的 API 结果不会写入本地临时文件或发送。",
+    "default": 20971520
+  },
+  "max_concurrent_generations": {
+    "description": "最大并发生成数",
+    "type": "int",
+    "hint": "用于限制同时调用外部生图 API 的请求数量。",
+    "default": 2
+  },
+  "api_adapter_mode": {
+    "description": "API 适配模式",
+    "type": "string",
+    "hint": "generic 使用通用 JSON/multipart 封装；openai_like 会附加常见 OpenAI 风格参数并沿用兼容解析。",
+    "options": ["generic", "openai_like"],
+    "default": "generic"
+  },
+  "negative_prompt": {
+    "description": "反向提示词",
+    "type": "text",
+    "hint": "如果 API 支持 negative_prompt，会随请求一起发送。",
+    "default": ""
+  },
+  "quality": {
+    "description": "图片质量参数",
+    "type": "string",
+    "hint": "例如 standard、hd 等，具体取决于真实 API。",
+    "default": ""
+  },
+  "style": {
+    "description": "风格参数",
+    "type": "string",
+    "hint": "例如 natural、vivid、anime 等，具体取决于真实 API。",
+    "default": ""
+  },
+  "seed": {
+    "description": "随机种子",
+    "type": "string",
+    "hint": "保留为字符串以兼容不同 API 的 seed 类型。",
+    "default": ""
+  },
+  "steps": {
+    "description": "采样步数",
+    "type": "int",
+    "default": 0
+  },
+  "guidance_scale": {
+    "description": "提示词引导强度",
+    "type": "float",
+    "default": 0.0
+  },
+  "output_format": {
+    "description": "输出格式参数",
+    "type": "string",
+    "hint": "会作为 response_format 发送，例如 url、b64_json。留空则不发送。",
+    "default": ""
+  },
+  "request_extra_json": {
+    "description": "额外 JSON 请求参数",
+    "type": "dict",
+    "hint": "附加到文生图 JSON 请求体中，用于适配供应商自定义字段。",
+    "items": {},
+    "default": {}
+  },
+  "request_extra_form_fields": {
+    "description": "额外 multipart 表单字段",
+    "type": "dict",
+    "hint": "附加到图生图 multipart form 中，用于适配供应商自定义字段。",
+    "items": {},
+    "default": {}
+  },
+  "custom_headers": {
+    "description": "自定义请求头",
+    "type": "dict",
+    "hint": "附加到 API 请求头中。不要在这里填写会被日志输出的敏感信息。",
+    "items": {},
+    "default": {}
+  },
+  "auth_header_name": {
+    "description": "鉴权请求头名称",
+    "type": "string",
+    "default": "Authorization"
+  },
+  "auth_scheme": {
+    "description": "鉴权 scheme",
+    "type": "string",
+    "hint": "默认 Bearer。若 API 要求直接传 API Key，可留空。",
+    "default": "Bearer"
+  },
+  "retry_attempts": {
+    "description": "失败重试次数",
+    "type": "int",
+    "hint": "对网络错误和 retry_status_codes 中的 HTTP 状态码生效。",
+    "default": 2
+  },
+  "retry_backoff_seconds": {
+    "description": "重试退避秒数",
+    "type": "float",
+    "hint": "第 n 次重试前等待 retry_backoff_seconds * n 秒。",
+    "default": 1.0
+  },
+  "retry_status_codes": {
+    "description": "可重试 HTTP 状态码",
+    "type": "list",
+    "default": [429, 500, 502, 503, 504]
+  },
+  "session_cooldown_seconds": {
+    "description": "会话生成冷却时间（秒）",
+    "type": "int",
+    "hint": "同一会话两次生成之间的最小间隔。0 表示不限制。",
+    "default": 0
+  },
+  "failure_circuit_breaker_threshold": {
+    "description": "失败熔断阈值",
+    "type": "int",
+    "hint": "连续失败达到该次数后，暂时停止调用外部 API。",
+    "default": 3
+  },
+  "failure_circuit_breaker_seconds": {
+    "description": "失败熔断时间（秒）",
+    "type": "int",
+    "default": 60
+  },
+  "fallback_text_to_image_on_img2img_failure": {
+    "description": "图生图失败时是否回退文生图",
+    "type": "bool",
+    "hint": "开启后，图生图 API 失败时会尝试用同一 prompt 走文生图。",
+    "default": false
+  },
+  "generation_progress_message": {
+    "description": "生成中提示文案",
+    "type": "string",
+    "default": "正在生成图片，请稍等……"
+  },
+  "generation_failed_message": {
+    "description": "生成失败提示文案",
+    "type": "string",
+    "default": "图片生成失败，请稍后再试。"
+  },
+  "missing_image_message": {
+    "description": "缺少图片提示文案",
+    "type": "string",
+    "default": "请先发送图片，或将图片和修改要求放在同一条消息中。"
+  },
+  "input_too_large_message": {
+    "description": "输入图片过大提示文案",
+    "type": "string",
+    "default": "图片过大，请压缩后再试。"
+  },
+  "cooldown_message": {
+    "description": "冷却中提示文案",
+    "type": "string",
+    "default": "请求过于频繁，请稍后再试。"
+  },
+  "service_unavailable_message": {
+    "description": "熔断中提示文案",
+    "type": "string",
+    "default": "生图服务暂时不可用，请稍后再试。"
+  },
+  "fallback_notice_message": {
+    "description": "回退文生图提示文案",
+    "type": "string",
+    "default": "图生图失败，已尝试按文本描述生成。"
+  }
+}

@@ -1,0 +1,18 @@
+name: astrbot_plugin_image_generator
+display_name: 图片生成插件
+desc: 识别聊天中的文生图和图生图需求，调用外部图片生成 API 并返回图片。
+version: 0.3.0
+author: YARIZM
+repo: ""
+astrbot_version: ">=4.0.0"
+support_platforms:
+  - aiocqhttp
+  - qq_official
+  - telegram
+  - wecom
+  - lark
+  - dingtalk
+  - discord
+  - slack
+  - kook
+  - satori
