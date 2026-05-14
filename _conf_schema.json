@@ -32,7 +32,7 @@
     "description": "默认图片尺寸",
     "type": "string",
     "hint": "用户未在消息中指定尺寸时使用。用户可在 prompt 中写 1024x1024、尺寸 768x1024 或 --size 512x512。",
-    "default": "1024x1024"
+    "default": "2048x2048"
   },
   "timeout_seconds": {
     "description": "超时时间（秒）",
@@ -87,6 +87,31 @@
     "hint": "超过该大小的 API 结果不会写入本地临时文件或发送。",
     "default": 20971520
   },
+  "normalize_output_images": {
+    "description": "是否规范化输出图片",
+    "type": "bool",
+    "hint": "开启后会在发送前重新编码图片，降低平台上传失败概率。",
+    "default": true
+  },
+  "output_image_format": {
+    "description": "输出图片格式",
+    "type": "string",
+    "hint": "支持 JPEG 或 PNG。QQ 官方平台建议 JPEG。",
+    "options": ["JPEG", "PNG"],
+    "default": "JPEG"
+  },
+  "output_jpeg_quality": {
+    "description": "JPEG 输出质量",
+    "type": "int",
+    "hint": "仅 output_image_format 为 JPEG 时生效。",
+    "default": 92
+  },
+  "max_output_image_dimension": {
+    "description": "输出图片最大边长",
+    "type": "int",
+    "hint": "发送前按比例缩放超过该边长的图片。0 表示不缩放。",
+    "default": 2048
+  },
   "max_concurrent_generations": {
     "description": "最大并发生成数",
     "type": "int",
@@ -99,6 +124,12 @@
     "hint": "generic 使用通用 JSON/multipart 封装；openai_like 会附加常见 OpenAI 风格参数并沿用兼容解析。",
     "options": ["generic", "openai_like"],
     "default": "generic"
+  },
+  "base_prompt": {
+    "description": "基础提示词",
+    "type": "text",
+    "hint": "每次文生图、图生图和 LLM 工具调用 API 前都会追加到用户 prompt 后，用于稳定提高出图质量。留空则不追加。",
+    "default": "masterpiece, best quality, ultra detailed, sharp focus, professional lighting, high resolution"
   },
   "negative_prompt": {
     "description": "反向提示词",
@@ -142,24 +173,43 @@
   },
   "request_extra_json": {
     "description": "额外 JSON 请求参数",
-    "type": "dict",
+    "type": "object",
     "hint": "附加到文生图 JSON 请求体中，用于适配供应商自定义字段。",
     "items": {},
     "default": {}
   },
   "request_extra_form_fields": {
     "description": "额外 multipart 表单字段",
-    "type": "dict",
+    "type": "object",
     "hint": "附加到图生图 multipart form 中，用于适配供应商自定义字段。",
     "items": {},
     "default": {}
   },
   "custom_headers": {
     "description": "自定义请求头",
-    "type": "dict",
+    "type": "object",
     "hint": "附加到 API 请求头中。不要在这里填写会被日志输出的敏感信息。",
     "items": {},
     "default": {}
+  },
+  "download_custom_headers": {
+    "description": "结果图片下载请求头",
+    "type": "object",
+    "hint": "仅用于下载 API 返回的图片 URL。签名 URL 通常应保持为空。",
+    "items": {},
+    "default": {}
+  },
+  "download_result_images": {
+    "description": "是否下载结果图片再发送",
+    "type": "bool",
+    "hint": "开启后插件会把 API 返回的 URL 下载为本地图片再发送；关闭后直接把 URL 交给 AstrBot 发送。",
+    "default": true
+  },
+  "fallback_to_result_url_on_download_failure": {
+    "description": "下载失败时回退直接发送 URL",
+    "type": "bool",
+    "hint": "仅适用于平台可直接发送远程图片 URL 的场景。QQ 官方通常应保持关闭。",
+    "default": false
   },
   "auth_header_name": {
     "description": "鉴权请求头名称",
@@ -246,5 +296,16 @@
     "description": "回退文生图提示文案",
     "type": "string",
     "default": "图生图失败，已尝试按文本描述生成。"
+  },
+  "send_failed_message": {
+    "description": "图片发送失败提示文案",
+    "type": "string",
+    "default": "图片生成成功，但发送失败，请稍后重试。"
+  },
+  "duplicate_request_window_seconds": {
+    "description": "重复请求去重窗口（秒）",
+    "type": "int",
+    "hint": "同一会话、同一模式、同一 prompt、同一图片在该时间内只触发一次生成。0 表示关闭。",
+    "default": 120
   }
 }
